@@ -1,0 +1,39 @@
+# Render Deployment Configuration
+# This file configures the deployment for Render.com
+
+services:
+  # Backend Web Service
+  - type: web
+    name: hotel-management-backend
+    env: node
+    plan: free  # or starter for $7/month
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node clean-server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: hotel-management-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+    healthCheckPath: /api/health
+    
+  # Frontend Static Site
+  - type: web
+    name: hotel-management-frontend
+    env: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://hotel-management-backend.onrender.com
+    
+databases:
+  # MongoDB Database (or use MongoDB Atlas)
+  - name: hotel-management-db
+    plan: free
