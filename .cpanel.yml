@@ -1,7 +1,9 @@
----
 deployment:
   tasks:
-    - export NODE_ENV=production
+  - export NODE_ENV=production
+  - npm install
+  - npm run build
+  - npm start
     - npm install
     - npm run build
     - npm start
