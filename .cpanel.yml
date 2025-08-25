@@ -1,4 +1,3 @@
 deployment:
   tasks:
-  - npm install
-  - npm run build
+    - echo "Test deployment"
