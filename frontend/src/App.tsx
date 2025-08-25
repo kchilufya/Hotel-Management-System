@@ -12,6 +12,9 @@ import GuestManagement from './components/Guests/GuestManagement';
 import BookingManagement from './components/Bookings/BookingManagement';
 import StaffManagement from './components/Staff/StaffManagement';
 import Reports from './components/Reports/Reports';
+import OnlineReservation from './components/Reservations/OnlineReservation';
+import ReservationStatus from './components/Reservations/ReservationStatus';
+import LandingPage from './components/Public/LandingPage';
 import './App.css';
 
 const theme = createTheme({
@@ -33,7 +36,10 @@ function App() {
         <Router>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/reservation" element={<OnlineReservation />} />
+            <Route path="/reservation-status" element={<ReservationStatus />} />
+            <Route path="/home" element={<LandingPage />} />
+            <Route path="/" element={<Navigate to="/home" replace />} />
             <Route
               path="/*"
               element={

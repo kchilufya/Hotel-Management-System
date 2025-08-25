@@ -5,11 +5,6 @@ import {
   Card,
   CardContent,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
   Table,
   TableBody,
   TableCell,
@@ -21,6 +16,11 @@ import {
   Alert,
   Pagination,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
   FormControl,
   InputLabel,
   Select,
@@ -36,6 +36,7 @@ import {
   Logout as CheckOutIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { API_ENDPOINTS } from '../../config/api';
 
 interface Guest {
   _id: string;
@@ -52,20 +53,25 @@ interface Room {
   status: string;
   pricePerNight: number;
   floor: number;
-  capacity: number;
+  capacity: {
+    adults: number;
+    children: number;
+  };
 }
 
 interface Booking {
   _id: string;
   bookingNumber: string;
-  guest: Guest;
-  room: Room;
+  guest: Guest | null;
+  room?: string; // Legacy field - just ID
+  rooms?: { room: Room }[]; // Current schema - array of room objects
   checkInDate: string;
   checkOutDate: string;
   numberOfGuests: number;
   numberOfNights: number;
   roomRate: number;
   totalAmount: number;
+  paidAmount: number;
   paymentStatus: 'pending' | 'partial' | 'paid' | 'refunded';
   bookingStatus: 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'no-show';
   specialRequests?: string;
@@ -78,11 +84,11 @@ interface Booking {
 
 interface ApiResponse {
   success: boolean;
-  data?: {
-    bookings: Booking[];
-    totalPages: number;
-    currentPage: number;
-    totalBookings: number;
+  data?: Booking[];
+  pagination?: {
+    page: number;
+    pages: number;
+    total: number;
   };
   message?: string;
 }
@@ -111,9 +117,30 @@ const BookingManagement: React.FC = () => {
     notes: '',
     discountAmount: 0,
     taxAmount: 0,
+    paidAmount: 0,
     paymentStatus: 'pending' as 'pending' | 'partial' | 'paid' | 'refunded',
     bookingStatus: 'confirmed' as 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled' | 'no-show'
   });
+
+  // Helper function to get room display text
+  const getRoomDisplayText = (booking: Booking) => {
+    if (booking.rooms && booking.rooms.length > 0 && booking.rooms[0].room) {
+      const room = booking.rooms[0].room;
+      return `Room ${room.roomNumber} (${room.type})`;
+    }
+    if (booking.room) {
+      return `Room (ID: ${booking.room.substring(booking.room.length - 4)})`; // Show last 4 chars of ID
+    }
+    return 'N/A';
+  };
+
+  // Helper function to get room object for editing
+  const getRoomForEdit = (booking: Booking): Room | null => {
+    if (booking.rooms && booking.rooms.length > 0 && booking.rooms[0].room) {
+      return booking.rooms[0].room;
+    }
+    return null;
+  };
 
   const resetForm = () => {
     setFormData({
@@ -127,6 +154,7 @@ const BookingManagement: React.FC = () => {
       notes: '',
       discountAmount: 0,
       taxAmount: 0,
+      paidAmount: 0,
       paymentStatus: 'pending',
       bookingStatus: 'confirmed'
     });
@@ -134,32 +162,27 @@ const BookingManagement: React.FC = () => {
 
   // Calculate number of nights and total amount
   const calculateTotal = useCallback(() => {
-    // Ensure we have valid dates and room rate
     if (!formData.checkInDate || !formData.checkOutDate || !formData.roomRate) {
       return { numberOfNights: 0, subtotal: 0, total: 0 };
     }
-    
+
     const checkIn = new Date(formData.checkInDate);
     const checkOut = new Date(formData.checkOutDate);
-    
-    // Validate dates
+
     if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime()) || checkOut <= checkIn) {
       return { numberOfNights: 0, subtotal: 0, total: 0 };
     }
-    
-    // Calculate nights
+
     const timeDiff = checkOut.getTime() - checkIn.getTime();
     const numberOfNights = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    
-    // Parse amounts safely
+
     const roomRate = Number(formData.roomRate) || 0;
     const taxAmount = Number(formData.taxAmount) || 0;
     const discountAmount = Number(formData.discountAmount) || 0;
-    
-    // Calculate totals
+
     const subtotal = numberOfNights * roomRate;
     const total = Math.max(0, subtotal + taxAmount - discountAmount);
-    
+
     return {
       numberOfNights,
       subtotal,
@@ -169,10 +192,35 @@ const BookingManagement: React.FC = () => {
 
   const calculatedValues = calculateTotal();
 
+  // Handle payment status and booking status changes
+  useEffect(() => {
+    if (formData.bookingStatus === 'checked-out' && calculatedValues.total > 0) {
+      setFormData(prev => ({
+        ...prev,
+        paidAmount: calculatedValues.total,
+        paymentStatus: 'paid'
+      }));
+    }
+
+    if (formData.paidAmount > 0 && calculatedValues.total > 0) {
+      if (formData.paidAmount >= calculatedValues.total) {
+        setFormData(prev => ({
+          ...prev,
+          paymentStatus: 'paid'
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          paymentStatus: 'partial'
+        }));
+      }
+    }
+  }, [formData.bookingStatus, formData.paidAmount, calculatedValues.total]);
+
   const fetchBookings = useCallback(async (page: number = 1) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5003/api/bookings?page=${page}`, {
+      const response = await fetch(`${API_ENDPOINTS.BOOKINGS}?page=${page}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -184,19 +232,19 @@ const BookingManagement: React.FC = () => {
       }
 
       const result: ApiResponse = await response.json();
-      
+
       if (result.success && result.data) {
-        setBookings(Array.isArray(result.data.bookings) ? result.data.bookings : []);
-        setTotalPages(result.data.totalPages || 1);
-        setCurrentPage(result.data.currentPage || 1);
-        setTotalBookings(result.data.totalBookings || 0);
-        setError(null);
+        setBookings(Array.isArray(result.data) ? result.data : []);
+        setTotalPages(result.pagination?.pages || 1);
+        setCurrentPage(result.pagination?.page || 1);
+        setTotalBookings(result.pagination?.total || 0);
       } else {
-        throw new Error(result.message || 'Failed to fetch bookings');
+        setBookings([]);
+        setError(result.message || 'Failed to load bookings');
       }
     } catch (err) {
       console.error('Error fetching bookings:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch bookings');
+      setError(err instanceof Error ? err.message : 'Failed to load bookings');
       setBookings([]);
     } finally {
       setLoading(false);
@@ -205,15 +253,20 @@ const BookingManagement: React.FC = () => {
 
   const fetchGuests = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5003/api/guests?limit=100', {
+      const response = await fetch(`${API_ENDPOINTS.GUESTS}?limit=100`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
-      if (result.success && result.data) {
-        setGuests(result.data.guests || []);
+      if (result.success && Array.isArray(result.data)) {
+        setGuests(result.data);
       }
     } catch (err) {
       console.error('Error fetching guests:', err);
@@ -222,15 +275,20 @@ const BookingManagement: React.FC = () => {
 
   const fetchAvailableRooms = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5003/api/rooms?status=available&limit=100', {
+      const response = await fetch(`${API_ENDPOINTS.ROOMS}?status=available&limit=100`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
-      if (result.success && result.data) {
-        setRooms(result.data.rooms || []);
+      if (result.success && Array.isArray(result.data)) {
+        setRooms(result.data);
       }
     } catch (err) {
       console.error('Error fetching rooms:', err);
@@ -238,56 +296,53 @@ const BookingManagement: React.FC = () => {
   }, [token]);
 
   useEffect(() => {
-    fetchBookings(currentPage);
-    fetchGuests();
-    fetchAvailableRooms();
-  }, [currentPage, token, fetchBookings, fetchGuests, fetchAvailableRooms]);
+    if (token) {
+      fetchBookings(currentPage);
+      fetchGuests();
+      fetchAvailableRooms();
+    }
+  }, [token, currentPage, fetchBookings, fetchGuests, fetchAvailableRooms]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.guest || !formData.room) {
-      setError('Please select both guest and room');
+
+    if (!formData.guest || !formData.room || !formData.checkInDate || !formData.checkOutDate) {
+      setError('Please fill in all required fields');
       return;
     }
 
-    if (!formData.roomRate || formData.roomRate <= 0) {
-      setError('Room rate must be greater than 0. Please reselect the room.');
-      return;
-    }
-
-    if (!user?.id) {
-      setError('User not authenticated');
+    const calculated = calculateTotal();
+    if (calculated.numberOfNights <= 0) {
+      setError('Invalid dates selected');
       return;
     }
 
     try {
-      const calculated = calculateTotal();
-      
       const bookingData = {
-        guest: formData.guest._id,
-        room: formData.room._id,
+        guestId: formData.guest._id,
+        roomId: formData.room._id,
         checkInDate: formData.checkInDate,
         checkOutDate: formData.checkOutDate,
         numberOfGuests: formData.numberOfGuests,
         numberOfNights: calculated.numberOfNights,
         roomRate: formData.roomRate,
         totalAmount: calculated.total,
+        paidAmount: formData.paidAmount,
         specialRequests: formData.specialRequests,
         notes: formData.notes,
         discountAmount: formData.discountAmount,
         taxAmount: formData.taxAmount,
         paymentStatus: formData.paymentStatus,
         bookingStatus: formData.bookingStatus,
-        createdBy: user?.id  // Add the required createdBy field
+        createdBy: user?.id
       };
 
-      const url = editingBooking 
-        ? `http://localhost:5003/api/bookings/${editingBooking._id}`
-        : 'http://localhost:5003/api/bookings';
-      
+      const url = editingBooking
+        ? `${API_ENDPOINTS.BOOKINGS}/${editingBooking._id}`
+        : API_ENDPOINTS.BOOKINGS;
+
       const method = editingBooking ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -303,10 +358,10 @@ const BookingManagement: React.FC = () => {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         await fetchBookings(currentPage);
-        await fetchAvailableRooms(); // Refresh available rooms
+        await fetchAvailableRooms();
         handleClose();
         setError(null);
       } else {
@@ -324,7 +379,7 @@ const BookingManagement: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5003/api/bookings/${bookingId}`, {
+      const response = await fetch(`${API_ENDPOINTS.BOOKINGS}/${bookingId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -337,10 +392,10 @@ const BookingManagement: React.FC = () => {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         await fetchBookings(currentPage);
-        await fetchAvailableRooms(); // Refresh available rooms
+        await fetchAvailableRooms();
         setError(null);
       } else {
         throw new Error(result.message || 'Failed to cancel booking');
@@ -353,7 +408,7 @@ const BookingManagement: React.FC = () => {
 
   const handleCheckIn = async (bookingId: string) => {
     try {
-      const response = await fetch(`http://localhost:5003/api/bookings/${bookingId}/checkin`, {
+      const response = await fetch(`${API_ENDPOINTS.BOOKINGS}/${bookingId}/checkin`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -366,7 +421,7 @@ const BookingManagement: React.FC = () => {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         await fetchBookings(currentPage);
         setError(null);
@@ -381,7 +436,7 @@ const BookingManagement: React.FC = () => {
 
   const handleCheckOut = async (bookingId: string) => {
     try {
-      const response = await fetch(`http://localhost:5003/api/bookings/${bookingId}/checkout`, {
+      const response = await fetch(`${API_ENDPOINTS.BOOKINGS}/${bookingId}/checkout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -394,7 +449,7 @@ const BookingManagement: React.FC = () => {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         await fetchBookings(currentPage);
         setError(null);
@@ -409,17 +464,19 @@ const BookingManagement: React.FC = () => {
 
   const handleEdit = (booking: Booking) => {
     setEditingBooking(booking);
+    const roomForEdit = getRoomForEdit(booking);
     setFormData({
       guest: booking.guest,
-      room: booking.room,
+      room: roomForEdit,
       checkInDate: booking.checkInDate.split('T')[0],
       checkOutDate: booking.checkOutDate.split('T')[0],
       numberOfGuests: booking.numberOfGuests,
-      roomRate: booking.room?.pricePerNight || booking.roomRate, // Use current room rate if available
+      roomRate: roomForEdit?.pricePerNight || booking.roomRate,
       specialRequests: booking.specialRequests || '',
       notes: booking.notes || '',
       discountAmount: booking.discountAmount,
       taxAmount: booking.taxAmount,
+      paidAmount: booking.paidAmount || 0,
       paymentStatus: booking.paymentStatus,
       bookingStatus: booking.bookingStatus
     });
@@ -441,15 +498,15 @@ const BookingManagement: React.FC = () => {
   };
 
   const getStatusChip = (status: string, type: 'booking' | 'payment') => {
-    const color = type === 'booking' ? 
-      (status === 'confirmed' ? 'primary' : 
-       status === 'checked-in' ? 'success' : 
-       status === 'checked-out' ? 'default' : 
+    const color = type === 'booking' ?
+      (status === 'confirmed' ? 'primary' :
+       status === 'checked-in' ? 'success' :
+       status === 'checked-out' ? 'default' :
        status === 'cancelled' ? 'error' : 'warning') :
-      (status === 'paid' ? 'success' : 
-       status === 'partial' ? 'warning' : 
+      (status === 'paid' ? 'success' :
+       status === 'partial' ? 'warning' :
        status === 'pending' ? 'default' : 'error');
-    
+
     return (
       <Chip
         label={status}
@@ -521,7 +578,7 @@ const BookingManagement: React.FC = () => {
                       {booking.guest ? `${booking.guest.firstName} ${booking.guest.lastName}` : 'N/A'}
                     </TableCell>
                     <TableCell>
-                      {booking.room ? `Room ${booking.room.roomNumber} (${booking.room.type})` : 'N/A'}
+                      {getRoomDisplayText(booking)}
                     </TableCell>
                     <TableCell>{formatDate(booking.checkInDate)}</TableCell>
                     <TableCell>{formatDate(booking.checkOutDate)}</TableCell>
@@ -607,12 +664,11 @@ const BookingManagement: React.FC = () => {
                 />
                 <Autocomplete
                   options={rooms}
-                  getOptionLabel={(option) => `Room ${option.roomNumber} (${option.type}) - ZK ${option.pricePerNight}/night`}
+                  getOptionLabel={(option) => `Room ${option.roomNumber} (${option.type}) - ZK ${option.pricePerNight}/night - Capacity: ${option.capacity.adults + option.capacity.children}`}
                   value={formData.room}
                   onChange={(_, newValue) => {
-                    console.log('Room selected:', newValue);
-                    setFormData({ 
-                      ...formData, 
+                    setFormData({
+                      ...formData,
                       room: newValue,
                       roomRate: newValue?.pricePerNight || 0
                     });
@@ -620,20 +676,10 @@ const BookingManagement: React.FC = () => {
                   renderInput={(params) => (
                     <TextField {...params} label="Room" required fullWidth />
                   )}
-                  renderOption={(props, option) => (
-                    <li {...props}>
-                      <div>
-                        <div><strong>Room {option.roomNumber}</strong> ({option.type})</div>
-                        <div style={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-                          ZK {option.pricePerNight}/night
-                        </div>
-                      </div>
-                    </li>
-                  )}
                   fullWidth
                 />
               </Box>
-              
+
               <Box display="flex" gap={2}>
                 <TextField
                   label="Check-in Date"
@@ -672,7 +718,7 @@ const BookingManagement: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, roomRate: parseFloat(e.target.value) || 0 })}
                   required
                   fullWidth
-                  disabled={true} // Make read-only since it comes from room selection
+                  disabled={true}
                   inputProps={{ step: 0.01, min: 0 }}
                   InputProps={{ startAdornment: <InputAdornment position="start">ZK</InputAdornment> }}
                   helperText="Rate is automatically set based on selected room"
@@ -700,8 +746,7 @@ const BookingManagement: React.FC = () => {
                 />
               </Box>
 
-              {/* Calculation Summary */}
-              {(formData.checkInDate && formData.checkOutDate && formData.roomRate > 0 && calculatedValues.numberOfNights > 0) && (
+              {calculatedValues.numberOfNights > 0 && (
                 <Card sx={{ p: 2, bgcolor: 'grey.50' }}>
                   <Typography variant="h6" gutterBottom>
                     Booking Summary
@@ -762,6 +807,24 @@ const BookingManagement: React.FC = () => {
                   </Select>
                 </FormControl>
               </Box>
+
+              {(formData.paymentStatus === 'partial' || formData.paymentStatus === 'paid' || formData.bookingStatus === 'checked-out') && (
+                <TextField
+                  label="Amount Paid"
+                  type="number"
+                  value={formData.paidAmount}
+                  onChange={(e) => setFormData({ ...formData, paidAmount: parseFloat(e.target.value) || 0 })}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">ZK</InputAdornment>,
+                  }}
+                  helperText={
+                    calculatedValues.total > 0
+                      ? `Total Amount: ZK ${calculatedValues.total.toFixed(2)} | Balance: ZK ${Math.max(0, calculatedValues.total - formData.paidAmount).toFixed(2)}`
+                      : undefined
+                  }
+                  fullWidth
+                />
+              )}
 
               <TextField
                 label="Special Requests"

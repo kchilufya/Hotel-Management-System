@@ -201,7 +201,7 @@ const StaffManagement: React.FC = () => {
       if (filterDepartment) params.append('department', filterDepartment);
       if (filterActive) params.append('isActive', filterActive);
 
-      const response = await fetch(`http://localhost:5003/api/staff?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/staff?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -242,8 +242,8 @@ const StaffManagement: React.FC = () => {
     try {
       setLoading(true);
       const url = editingStaff 
-        ? `http://localhost:5003/api/staff/${editingStaff._id}`
-        : 'http://localhost:5003/api/staff';
+        ? `http://localhost:5000/api/staff/${editingStaff._id}`
+        : 'http://localhost:5000/api/staff';
       
       const method = editingStaff ? 'PUT' : 'POST';
       
@@ -292,7 +292,7 @@ const StaffManagement: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5003/api/staff/${editingStaff._id}/password`, {
+      const response = await fetch(`http://localhost:5000/api/staff/${editingStaff._id}/password`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -345,7 +345,7 @@ const StaffManagement: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5003/api/staff/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/staff/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

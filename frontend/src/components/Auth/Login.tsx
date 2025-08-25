@@ -51,7 +51,7 @@ const Login: React.FC = () => {
         <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography component="h1" variant="h4" gutterBottom>
-              🏨 Hotel Management
+              🏨 Zanji Lodge Management
             </Typography>
             <Typography component="h2" variant="h6" color="textSecondary" gutterBottom>
               Sign in to your account

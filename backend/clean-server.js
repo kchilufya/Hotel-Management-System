@@ -196,6 +196,10 @@ bookingSchema.pre('save', async function(next) {
 
 const Booking = mongoose.model('Booking', bookingSchema);
 
+// Public routes (no authentication required) - added after models are defined
+const publicRoutes = require('./routes/public');
+app.use('/api/public', publicRoutes);
+
 // Authentication middleware
 const authenticateToken = async (req, res, next) => {
   try {

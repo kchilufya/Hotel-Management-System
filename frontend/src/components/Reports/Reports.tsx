@@ -121,8 +121,8 @@ const Reports: React.FC = () => {
       const token = localStorage.getItem('token');
       
       const url = params 
-        ? `http://localhost:5003/api/reports/${endpoint}?${params.toString()}`
-        : `http://localhost:5003/api/reports/${endpoint}`;
+        ? `http://localhost:5000/api/reports/${endpoint}?${params.toString()}`
+        : `http://localhost:5000/api/reports/${endpoint}`;
       
       const response = await fetch(url, {
         headers: {

@@ -16,6 +16,14 @@ const bookingRoutes = require('./routes/bookings');
 const staffRoutes = require('./routes/staff');
 const reportRoutes = require('./routes/reports');
 
+let publicRoutes;
+try {
+  publicRoutes = require('./routes/public');
+  console.log('✅ Public routes module loaded successfully');
+} catch (error) {
+  console.error('❌ Error loading public routes:', error);
+}
+
 // Middleware
 app.use(helmet());
 app.use(cors());
@@ -48,6 +56,13 @@ const connectDB = async () => {
     app.use('/api/bookings', bookingRoutes);
     app.use('/api/staff', staffRoutes);
     app.use('/api/reports', reportRoutes);
+    console.log('📢 Registering public routes...');
+    if (publicRoutes) {
+      app.use('/api/public', publicRoutes);
+      console.log('✅ Public routes registered');
+    } else {
+      console.log('❌ Public routes not available');
+    }
     
     // Health check endpoint
     app.get('/api/health', (req, res) => {
@@ -70,6 +85,7 @@ const connectDB = async () => {
 
     // 404 handler (must be last)
     app.use((req, res) => {
+      console.log(`❌ 404 - Route not found: ${req.method} ${req.url}`);
       res.status(404).json({
         success: false,
         message: 'API endpoint not found'

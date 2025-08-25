@@ -126,7 +126,7 @@ const RoomManagement: React.FC = () => {
       setLoading(true);
       console.log('Fetching rooms - page:', page + 1, 'search:', searchTerm, 'status:', statusFilter, 'type:', typeFilter, 'floor:', floorFilter);
       
-      const response = await axios.get('http://localhost:5003/api/rooms', {
+      const response = await axios.get('http://localhost:5000/api/rooms', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -223,7 +223,7 @@ const RoomManagement: React.FC = () => {
       
       if (dialogMode === 'add') {
         console.log('Creating new room...');
-        const response = await axios.post('http://localhost:5003/api/rooms', formData, {
+        const response = await axios.post('http://localhost:5000/api/rooms', formData, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -238,7 +238,7 @@ const RoomManagement: React.FC = () => {
       } else if (dialogMode === 'edit' && selectedRoom) {
         console.log('Updating room:', selectedRoom._id);
         console.log('Update data being sent:', formData);
-        const response = await axios.put(`http://localhost:5003/api/rooms/${selectedRoom._id}`, formData, {
+        const response = await axios.put(`http://localhost:5000/api/rooms/${selectedRoom._id}`, formData, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -288,7 +288,7 @@ const RoomManagement: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this room?')) {
       try {
         setLoading(true);
-        await axios.delete(`http://localhost:5003/api/rooms/${roomId}`, {
+        await axios.delete(`http://localhost:5000/api/rooms/${roomId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

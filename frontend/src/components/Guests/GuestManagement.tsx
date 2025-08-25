@@ -122,7 +122,7 @@ const GuestManagement: React.FC = () => {
   const fetchGuests = async (page: number = 1) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5003/api/guests?page=${page}`, {
+      const response = await fetch(`http://localhost:5000/api/guests?page=${page}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -162,8 +162,8 @@ const GuestManagement: React.FC = () => {
     
     try {
       const url = editingGuest 
-        ? `http://localhost:5003/api/guests/${editingGuest._id}`
-        : 'http://localhost:5003/api/guests';
+        ? `http://localhost:5000/api/guests/${editingGuest._id}`
+        : 'http://localhost:5000/api/guests';
       
       const method = editingGuest ? 'PUT' : 'POST';
       
@@ -201,7 +201,7 @@ const GuestManagement: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5003/api/guests/${guestId}`, {
+      const response = await fetch(`http://localhost:5000/api/guests/${guestId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

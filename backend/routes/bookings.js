@@ -21,7 +21,7 @@ router.get('/', authMiddleware, checkPermission('viewBookings'), async (req, res
 
     const bookings = await Booking.find(filter)
       .populate('guest', 'firstName lastName email phone')
-      .populate('rooms.room', 'roomNumber type floor')
+      .populate('rooms.room', 'roomNumber type floor pricePerNight capacity')
       .populate('checkedInBy', 'firstName lastName')
       .populate('checkedOutBy', 'firstName lastName')
       .sort({ createdAt: -1 })
@@ -300,11 +300,17 @@ router.post('/:id/checkin', authMiddleware, checkPermission('checkIn'), async (r
 // Check-out guest
 router.post('/:id/checkout', authMiddleware, checkPermission('checkOut'), async (req, res) => {
   try {
+    console.log('🔍 Checkout request for booking ID:', req.params.id);
+    
     const booking = await Booking.findById(req.params.id)
       .populate('rooms.room')
       .populate('guest');
     
+    console.log('📋 Found booking:', booking ? booking.bookingNumber : 'Not found');
+    console.log('📊 Booking status:', booking ? booking.status : 'N/A');
+    
     if (!booking) {
+      console.log('❌ Booking not found');
       return res.status(404).json({
         success: false,
         message: 'Booking not found'
@@ -312,6 +318,7 @@ router.post('/:id/checkout', authMiddleware, checkPermission('checkOut'), async 
     }
 
     if (booking.status !== 'checkedIn') {
+      console.log('❌ Invalid status for checkout. Current status:', booking.status);
       return res.status(400).json({
         success: false,
         message: 'Guest must be checked in before check-out'
@@ -407,6 +414,175 @@ router.post('/:id/cancel', [
     });
   } catch (error) {
     console.error('Cancel booking error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// Update booking
+router.put('/:id', [
+  authMiddleware,
+  checkPermission('editBookings'),
+  body('guest').optional().isMongoId(),
+  body('rooms').optional().isArray(),
+  body('rooms.*.room').optional().isMongoId(),
+  body('rooms.*.quantity').optional().isInt({ min: 1 }),
+  body('checkInDate').optional().isISO8601(),
+  body('checkOutDate').optional().isISO8601(),
+  body('numberOfGuests').optional().isInt({ min: 1 }),
+  body('numberOfNights').optional().isInt({ min: 1 }),
+  body('roomRate').optional().isFloat({ min: 0 }),
+  body('totalAmount').optional().isFloat({ min: 0 }),
+  body('paidAmount').optional().isFloat({ min: 0 }),
+  body('paymentStatus').optional().isIn(['pending', 'partial', 'paid', 'refunded']),
+  body('bookingStatus').optional().isIn(['pending', 'confirmed', 'checked-in', 'checked-out', 'cancelled']),
+  body('specialRequests').optional().trim(),
+  body('notes').optional().trim()
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { id } = req.params;
+    const updateData = req.body;
+
+    // Transform frontend field names to backend field names
+    if (updateData.guestId) {
+      updateData.guest = updateData.guestId;
+      delete updateData.guestId;
+    }
+    
+    if (updateData.roomId) {
+      // Create rooms array structure that matches the current model
+      updateData.rooms = [{
+        room: updateData.roomId,
+        guests: {
+          adults: updateData.numberOfGuests || 1, // Use numberOfGuests or default to 1
+          children: 0 // Default to 0 children
+        }
+      }];
+      delete updateData.roomId;
+    }
+
+    // Handle adults/children data if provided separately
+    if (updateData.adults || updateData.children) {
+      if (updateData.rooms && updateData.rooms.length > 0) {
+        updateData.rooms[0].guests = {
+          adults: updateData.adults || updateData.numberOfGuests || 1,
+          children: updateData.children || 0
+        };
+      }
+      delete updateData.adults;
+      delete updateData.children;
+    }
+
+    // Find the existing booking
+    const existingBooking = await Booking.findById(id);
+    if (!existingBooking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    // Check if booking can be modified
+    if (existingBooking.bookingStatus === 'checked-out' || existingBooking.bookingStatus === 'cancelled') {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot modify a booking that is checked-out or cancelled'
+      });
+    }
+
+    // If updating dates, check for conflicts
+    if (updateData.checkInDate || updateData.checkOutDate) {
+      const checkInDate = new Date(updateData.checkInDate || existingBooking.checkInDate);
+      const checkOutDate = new Date(updateData.checkOutDate || existingBooking.checkOutDate);
+      
+      if (checkInDate >= checkOutDate) {
+        return res.status(400).json({
+          success: false,
+          message: 'Check-out date must be after check-in date'
+        });
+      }
+
+      // Check room availability for new dates (excluding current booking)
+      let roomIds = [];
+      
+      if (updateData.room) {
+        // Single room (legacy or updated)
+        roomIds = [updateData.room];
+      } else if (updateData.rooms && updateData.rooms.length > 0) {
+        // Multiple rooms array
+        roomIds = updateData.rooms.map(r => r.room);
+      } else if (existingBooking.room) {
+        // Use existing single room
+        roomIds = [existingBooking.room];
+      } else if (existingBooking.rooms && existingBooking.rooms.length > 0) {
+        // Use existing rooms array
+        roomIds = existingBooking.rooms.map(r => r.room);
+      }
+
+      if (roomIds.length > 0) {
+        const conflictingBooking = await Booking.findOne({
+          _id: { $ne: id }, // Exclude current booking
+          $or: [
+            { room: { $in: roomIds } }, // Legacy single room structure
+            { rooms: { $elemMatch: { room: { $in: roomIds } } } } // New rooms array structure
+          ],
+          bookingStatus: { $in: ['confirmed', 'checked-in'] },
+          $and: [
+            {
+              checkInDate: { $lt: checkOutDate },
+              checkOutDate: { $gt: checkInDate }
+            }
+          ]
+        });
+
+        if (conflictingBooking) {
+          return res.status(400).json({
+            success: false,
+            message: 'Room is not available for the selected dates'
+          });
+        }
+      }
+    }
+
+    // Update booking
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      id,
+      {
+        ...updateData,
+        updatedAt: new Date()
+      },
+      { new: true, runValidators: true }
+    );
+
+    // Populate the updated booking
+    const populatedBooking = await Booking.findById(updatedBooking._id)
+      .populate('guest', 'firstName lastName email phone')
+      .populate('rooms.room', 'roomNumber type floor pricePerNight capacity')
+      .populate('checkedInBy', 'firstName lastName')
+      .populate('checkedOutBy', 'firstName lastName')
+      .populate('createdBy', 'firstName lastName');
+
+    console.log('✅ Booking updated:', populatedBooking.bookingNumber);
+
+    res.json({
+      success: true,
+      message: 'Booking updated successfully',
+      data: populatedBooking
+    });
+
+  } catch (error) {
+    console.error('Update booking error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'

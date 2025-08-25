@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
-import { API_ENDPOINTS } from '../config/api';
 
 interface User {
   id: string;
@@ -46,7 +45,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
           const response = await axios.get('http://localhost:5000/api/auth/me');
-          console.log('Auth initialization response:', response.data);
           setUser(response.data.staff);
           setToken(storedToken);
         } catch (error) {
@@ -70,8 +68,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password
       });
 
-      console.log('Login response:', response.data);
-
       if (response.data.success) {
         const { token: newToken, staff: userData } = response.data;
         
@@ -85,12 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(response.data.message || 'Login failed');
       }
     } catch (error: any) {
-      console.error('Login error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        config: error.config
-      });
+      console.error('Login error:', error);
       const message = error.response?.data?.message || error.message || 'Login failed';
       throw new Error(message);
     }
@@ -113,5 +104,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-export default AuthProvider;

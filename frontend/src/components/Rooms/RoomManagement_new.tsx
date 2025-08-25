@@ -143,7 +143,7 @@ const RoomManagement: React.FC = () => {
       if (floorFilter) params.append('floor', floorFilter);
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5003/api/rooms?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/rooms?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -228,7 +228,7 @@ const RoomManagement: React.FC = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5003/api/rooms/${roomId}`, {
+      const response = await fetch(`http://localhost:5000/api/rooms/${roomId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -253,8 +253,8 @@ const RoomManagement: React.FC = () => {
       const token = localStorage.getItem('token');
       
       const url = dialogMode === 'add' 
-        ? 'http://localhost:5003/api/rooms'
-        : `http://localhost:5003/api/rooms/${selectedRoom?._id}`;
+        ? 'http://localhost:5000/api/rooms'
+        : `http://localhost:5000/api/rooms/${selectedRoom?._id}`;
       
       const method = dialogMode === 'add' ? 'POST' : 'PUT';
 

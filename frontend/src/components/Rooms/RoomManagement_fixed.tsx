@@ -124,7 +124,7 @@ const RoomManagement: React.FC = () => {
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5003/api/rooms', {
+      const response = await axios.get('http://localhost:5000/api/rooms', {
         params: {
           page: page + 1,
           limit: rowsPerPage,
@@ -200,14 +200,14 @@ const RoomManagement: React.FC = () => {
       setLoading(true);
       
       if (dialogMode === 'add') {
-        await axios.post('http://localhost:5003/api/rooms', formData);
+        await axios.post('http://localhost:5000/api/rooms', formData);
         setSnackbar({
           open: true,
           message: 'Room created successfully',
           severity: 'success'
         });
       } else if (dialogMode === 'edit' && selectedRoom) {
-        await axios.put(`http://localhost:5003/api/rooms/${selectedRoom._id}`, formData);
+        await axios.put(`http://localhost:5000/api/rooms/${selectedRoom._id}`, formData);
         setSnackbar({
           open: true,
           message: 'Room updated successfully',
@@ -233,7 +233,7 @@ const RoomManagement: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this room?')) {
       try {
         setLoading(true);
-        await axios.delete(`http://localhost:5003/api/rooms/${roomId}`);
+        await axios.delete(`http://localhost:5000/api/rooms/${roomId}`);
         setSnackbar({
           open: true,
           message: 'Room deleted successfully',

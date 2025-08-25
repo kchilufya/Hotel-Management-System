@@ -1,0 +1,7 @@
+node_modules\
+.env.example
+test-*.js
+check-*.js
+*.log
+.git\
+.vscode\

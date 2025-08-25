@@ -45,8 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (storedToken) {
         try {
           axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-          const response = await axios.get('http://localhost:5000/api/auth/me');
-          console.log('Auth initialization response:', response.data);
+          const response = await axios.get(API_ENDPOINTS.ME);
           setUser(response.data.staff);
           setToken(storedToken);
         } catch (error) {
@@ -64,13 +63,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      console.log('Making login request to:', 'http://localhost:5000/api/auth/login');
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      console.log('Making login request to:', API_ENDPOINTS.LOGIN);
+      const response = await axios.post(API_ENDPOINTS.LOGIN, {
         email,
         password
       });
-
-      console.log('Login response:', response.data);
 
       if (response.data.success) {
         const { token: newToken, staff: userData } = response.data;
@@ -85,12 +82,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(response.data.message || 'Login failed');
       }
     } catch (error: any) {
-      console.error('Login error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        config: error.config
-      });
+      console.error('Login error:', error);
       const message = error.response?.data?.message || error.message || 'Login failed';
       throw new Error(message);
     }
@@ -113,5 +105,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-export default AuthProvider;
