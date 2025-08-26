@@ -8,7 +8,7 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(cors());
+.use(cors());
 app.use(express.json());
 
 // Staff Schema
