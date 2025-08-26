@@ -1,5 +1,4 @@
 deployment:
   tasks:
     - cd backend
-    - npm install
     - npm start
