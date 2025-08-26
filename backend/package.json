@@ -1,5 +1,4 @@
-{
-  "name": "hotelmanagement",
+{  "name": "hotelmanagement",
   "version": "1.0.0",
   "description": "A comprehensive hotel management system with Node.js backend and React frontend",
   "main": "backend/server.js",
@@ -38,5 +37,7 @@
   "devDependencies": {
     "concurrently": "^9.2.0",
     "nodemon": "^3.1.10"
+"node": ">=16.0.0",
+    "npm": ">=8.0.0"
   }
 }
