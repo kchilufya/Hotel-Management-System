@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+echo; "// trigger re-commit" >> clean-server.js
 
 const app = express();
 
@@ -197,7 +198,7 @@ bookingSchema.pre('save', async function(next) {
 const Booking = mongoose.model('Booking', bookingSchema);
 
 // Public routes (no authentication required) - added after models are defined`
-const publicRoutes = require('./routes/public.js');
+const publicRoutes = require('./routes/public');
 app.use('/api/public', publicRoutes);
 
 // Authentication middleware
