@@ -2,4 +2,3 @@
 deployment:
   tasks:
     - cd /home/ihszambia/hotelmanagement/backend
-    - npm install
