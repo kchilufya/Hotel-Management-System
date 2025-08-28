@@ -1,6 +1,5 @@
 ---
 deployment:
   tasks:
-    - cd backend
     - export NODE_ENV=production
     - npm start
