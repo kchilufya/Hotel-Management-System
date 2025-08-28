@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -114,3 +115,14 @@ const startServer = async () => {
 startServer();
 
 module.exports = app;
+=======
+var http = require('http');
+var server = http.createServer(function(req, res) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    var message = 'It works!\n',
+        version = 'NodeJS ' + process.versions.node + '\n',
+        response = [message, version].join('\n');
+    res.end(response);
+});
+server.listen();
+>>>>>>> 4a122d279a37f1e2a4514b4af95ee7bcdac2cbd5
