@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-    - cd backend
-    - export NODE_ENV=production
+    - cd /home/ihszambia/hotelmanagement/backend
+    - npm install
