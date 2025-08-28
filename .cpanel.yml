@@ -1,4 +1,3 @@
 ---
 deployment:
   tasks:
-    - cd /home/ihszambia/hotelmanagement/backend
