@@ -78,3 +78,8 @@ frontend/build/
 # Package lock files (choose one)
 # package-lock.json
 # yarn.lock
+node_modules/
+.env
+*.log
+.DS_Store
+
