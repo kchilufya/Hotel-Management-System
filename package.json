@@ -13,7 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy:prepare": "npm install && cd frontend && npm install && npm run build && cd ../backend && npm install",
     "deploy:heroku": "npm run deploy:prepare && git add . && git commit -m \"Deploy to production\" && git push heroku main",
-    "postinstall": "cd backend && npm install && cd ../frontend && npm install",
+  // ...existing code...
     "heroku-postbuild": "cd frontend && npm install && npm run build"
   },
   "keywords": ["hotel", "management", "booking", "reservation", "nodejs", "react"],
