@@ -2232,7 +2232,7 @@ async function startServer() {
           lastName: 'Rodriguez',
           email: 'carlos.rodriguez@email.com',
           phone: '+34-91-123-4567',
-          address: 'Calle Mayor 100, Madrid 28013, Spain',
+          address: 'Calle Mayor 100, Madrid  28013, Spain',
           documentType: 'nationalId',
           documentNumber: 'ES12345678Z',
           dateOfBirth: new Date('1982-11-08'),
