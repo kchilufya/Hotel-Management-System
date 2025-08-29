@@ -1,5 +1,4 @@
 const express = require('express');
-<<<<<<< HEAD
 const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
 
@@ -368,13 +367,11 @@ router.post('/reservations/:bookingNumber/cancel', [
       message: 'Server error'
     });
   }
-=======
 const router = express.Router();
 
 // Public route example
 router.get('/', (req, res) => {
   res.send('Welcome to the public endpoint!');
->>>>>>> 4a122d279a37f1e2a4514b4af95ee7bcdac2cbd5
 });
 
 module.exports = router;
