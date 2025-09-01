@@ -1993,15 +1993,14 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/build')));
 
   // Catch all handler: send back React's index.html file for any non-API routes
-  app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
-});
-
-// API 404 fallback
-app.use('/api', (req, res) => {
-  res.status(404).json({ message: 'API endpoint not found' });
-});
-
+  app.get('*', (req, res) => {
+    // Skip API routes
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({ message: 'API endpoint not found' });
+    }
+    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+  });
+}
 
 // Start server and initialize database
 async function startServer() {
