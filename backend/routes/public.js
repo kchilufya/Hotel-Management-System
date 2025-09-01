@@ -367,11 +367,6 @@ router.post('/reservations/:bookingNumber/cancel', [
       message: 'Server error'
     });
   }
-const router = express.Router();
-
-// Public route example
-router.get('/', (req, res) => {
-  res.send('Welcome to the public endpoint!');
 });
 
 module.exports = router;

@@ -83,4 +83,4 @@ guestSchema.index({ email: 1 });
 guestSchema.index({ phone: 1 });
 guestSchema.index({ idNumber: 1 });
 
-module.exports = mongoose.model('Guest', guestSchema);
+module.exports = mongoose.models.Guest || mongoose.model('Guest', guestSchema);

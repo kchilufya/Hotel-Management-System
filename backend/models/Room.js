@@ -103,4 +103,4 @@ roomSchema.index({ type: 1, status: 1 });
 roomSchema.index({ floor: 1 });
 roomSchema.index({ pricePerNight: 1 });
 
-module.exports = mongoose.model('Room', roomSchema);
+module.exports = mongoose.models.Room || mongoose.model('Room', roomSchema);

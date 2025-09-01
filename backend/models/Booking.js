@@ -148,4 +148,4 @@ bookingSchema.index({ checkInDate: 1, checkOutDate: 1 });
 bookingSchema.index({ status: 1 });
 bookingSchema.index({ createdAt: -1 });
 
-module.exports = mongoose.model('Booking', bookingSchema);
+module.exports = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
