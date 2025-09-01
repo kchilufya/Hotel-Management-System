@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -42,7 +41,7 @@ app.use('/api', limiter);
 // Database connection
 const connectDB = async () => {
   try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/hotel_management';
+  const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://yourUsername:password@cluster.mongodb.net/hotel_management';
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -115,14 +114,3 @@ const startServer = async () => {
 startServer();
 
 module.exports = app;
-=======
-var http = require('http');
-var server = http.createServer(function(req, res) {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    var message = 'It works!\n',
-        version = 'NodeJS ' + process.versions.node + '\n',
-        response = [message, version].join('\n');
-    res.end(response);
-});
-server.listen();
->>>>>>> 4a122d279a37f1e2a4514b4af95ee7bcdac2cbd5

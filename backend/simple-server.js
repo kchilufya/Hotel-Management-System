@@ -365,7 +365,7 @@ app.get('/api/test', (req, res) => {
 // Connect to MongoDB and start server
 async function startServer() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hotel_management');
+  await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://yourUsername:password@cluster.mongodb.net/hotel_management');
     console.log('✅ MongoDB connected');
     
     // Create admin user if it doesn't exist

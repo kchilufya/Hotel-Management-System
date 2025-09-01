@@ -5,7 +5,7 @@ const Staff = require('./models/Staff');
 
 async function cleanupAndReseed() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hotel_management');
+  await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://yourUsername:password@cluster.mongodb.net/hotel_management');
     console.log('Connected to MongoDB');
     
     // Remove all staff with null employeeId

@@ -142,7 +142,7 @@ app.use('*', (req, res) => {
 // Database connection
 const connectDB = async () => {
   try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/hotel_management';
+  const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://yourUsername:password@cluster.mongodb.net/hotel_management';
     
     const options = {
       useNewUrlParser: true,
