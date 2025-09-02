@@ -1,7 +1,8 @@
 ---
 deployment:
   tasks:
-   - echo "Starting deployment tasks..."
+    - source /home/yourcpanelusername/nodevenv/yourappname/16/bin/activate
+    - echo "Starting deployment tasks..."
     - cd backend
     - npm install
     - echo "Dependencies installed."
