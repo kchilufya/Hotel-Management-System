@@ -62,9 +62,9 @@ router.get('/role/:role', authMiddleware, checkPermission('viewStaff'), async (r
 });
 
 // Get staff by ID
-router.get('/:id', authMiddleware, checkPermission('viewStaff'), async (req, res) => {
+router.get('/:staffId', authMiddleware, checkPermission('viewStaff'), async (req, res) => {
   try {
-    const staff = await Staff.findById(req.params.id).select('-password');
+    const staff = await Staff.findById(req.params.staffId).select('-password');
     
     if (!staff) {
       return res.status(404).json({
@@ -155,7 +155,7 @@ router.post('/', [
 });
 
 // Update staff member
-router.put('/:id', [
+router.put('/:staffId', [
   authMiddleware,
   checkPermission('editStaff'),
   body('firstName').optional().notEmpty().trim(),
@@ -181,7 +181,7 @@ router.put('/:id', [
     if (req.body.email) {
       const existingStaff = await Staff.findOne({
         email: req.body.email,
-        _id: { $ne: req.params.id }
+        _id: { $ne: req.params.staffId }
       });
 
       if (existingStaff) {
@@ -196,7 +196,7 @@ router.put('/:id', [
     delete req.body.password;
 
     const staff = await Staff.findByIdAndUpdate(
-      req.params.id,
+      req.params.staffId,
       req.body,
       { new: true, runValidators: true }
     ).select('-password');
@@ -223,10 +223,10 @@ router.put('/:id', [
 });
 
 // Deactivate staff member
-router.delete('/:id', authMiddleware, checkPermission('editStaff'), async (req, res) => {
+router.delete('/:staffId', authMiddleware, checkPermission('editStaff'), async (req, res) => {
   try {
     const staff = await Staff.findByIdAndUpdate(
-      req.params.id,
+      req.params.staffId,
       { isActive: false },
       { new: true }
     ).select('-password');

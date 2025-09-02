@@ -369,4 +369,10 @@ router.post('/reservations/:bookingNumber/cancel', [
   }
 });
 
+// Example dynamic routes (ensure all are named)
+router.get('/rooms/:id', getRoomById);
+router.post('/guests/:guestId/bookings', createBooking);
+router.put('/bookings/:bookingNumber', updateBooking);
+router.delete('/staff/:staffId', deleteStaff);
+
 module.exports = router;

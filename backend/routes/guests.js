@@ -47,9 +47,9 @@ router.get('/', authMiddleware, checkPermission('viewGuests'), async (req, res) 
 });
 
 // Get guest by ID
-router.get('/:id', authMiddleware, checkPermission('viewGuests'), async (req, res) => {
+router.get('/:guestId', authMiddleware, checkPermission('viewGuests'), async (req, res) => {
   try {
-    const guest = await Guest.findById(req.params.id);
+    const guest = await Guest.findById(req.params.guestId);
     
     if (!guest) {
       return res.status(404).json({
@@ -137,7 +137,7 @@ router.post('/', [
 });
 
 // Update guest
-router.put('/:id', [
+router.put('/:guestId', [
   authMiddleware,
   checkPermission('editGuests'),
   body('firstName').optional().notEmpty().trim(),
@@ -161,7 +161,7 @@ router.put('/:id', [
     if (req.body.email) {
       const existingGuest = await Guest.findOne({
         email: req.body.email,
-        _id: { $ne: req.params.id }
+        _id: { $ne: req.params.guestId }
       });
 
       if (existingGuest) {
@@ -173,7 +173,7 @@ router.put('/:id', [
     }
 
     const guest = await Guest.findByIdAndUpdate(
-      req.params.id,
+      req.params.guestId,
       req.body,
       { new: true, runValidators: true }
     );
@@ -200,10 +200,10 @@ router.put('/:id', [
 });
 
 // Delete guest (soft delete)
-router.delete('/:id', authMiddleware, checkPermission('editGuests'), async (req, res) => {
+router.delete('/:guestId', authMiddleware, checkPermission('editGuests'), async (req, res) => {
   try {
     const guest = await Guest.findByIdAndUpdate(
-      req.params.id,
+      req.params.guestId,
       { isActive: false },
       { new: true }
     );

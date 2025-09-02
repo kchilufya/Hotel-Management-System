@@ -590,4 +590,8 @@ router.put('/:id', [
   }
 });
 
+router.get('/:bookingNumber', getBookingByNumber); // valid
+router.put('/:bookingNumber', updateBooking);      // valid
+router.delete('/:bookingNumber', deleteBooking);   // valid
+
 module.exports = router;
