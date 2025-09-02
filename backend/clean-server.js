@@ -1991,7 +1991,7 @@ const path = require('path');
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-  // Express v5 compatible catch-all route
+  // Express v5 compatible catch-all route for React frontend
   app.get('/:wildcard(*)', (req, res) => {
     if (req.path.startsWith('/api/')) {
       return res.status(404).json({ message: 'API endpoint not found' });
