@@ -8,7 +8,9 @@ const router = express.Router();
 const Room = require('../models/Room');
 const Guest = require('../models/Guest');
 const Booking = require('../models/Booking');
-const { getRoomById } = require('./rooms'); // Add this import at the top
+const { getRoomById } = require('./rooms');
+const { createBooking, updateBooking } = require('./bookings');
+const { deleteStaff } = require('./staff');
 
 console.log('🔧 Public routes loaded');
 

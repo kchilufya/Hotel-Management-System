@@ -291,4 +291,11 @@ router.post('/:id/reset-password', [
   }
 });
 
-module.exports = router;
+const deleteStaff = async (req, res) => {
+  /* ... */
+};
+
+module.exports = {
+  deleteStaff,
+  // ...other exports...
+};

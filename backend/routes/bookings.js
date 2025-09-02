@@ -590,8 +590,11 @@ router.put('/:id', [
   }
 });
 
-router.get('/:bookingNumber', getBookingByNumber); // valid
-router.put('/:bookingNumber', updateBooking);      // valid
-router.delete('/:bookingNumber', deleteBooking);   // valid
+const createBooking = async (req, res) => { /* ... */ };
+const updateBooking = async (req, res) => { /* ... */ };
 
-module.exports = router;
+module.exports = {
+  createBooking,
+  updateBooking,
+  // ...other exports...
+};

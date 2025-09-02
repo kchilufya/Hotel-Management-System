@@ -90,7 +90,7 @@ router.get('/available', authMiddleware, checkPermission('viewRooms'), async (re
 });
 
 // Get room by ID
-router.get('/:id', authMiddleware, checkPermission('viewRooms'), async (req, res) => {
+const getRoomById = async (req, res) => {
   try {
     const room = await Room.findById(req.params.id);
     
@@ -112,7 +112,7 @@ router.get('/:id', authMiddleware, checkPermission('viewRooms'), async (req, res
       message: 'Server error'
     });
   }
-});
+};
 
 // Create new room
 router.post('/', [
@@ -241,4 +241,7 @@ router.delete('/:id', authMiddleware, checkPermission('editRooms'), async (req, 
   }
 });
 
-module.exports = router;
+module.exports = {
+  getRoomById,
+  // ...other exports...
+};
