@@ -1,10 +1,6 @@
 deployment:
   tasks:
-    - echo "Starting deployment tasks..."
-    - cd backend
-    - npm install
-    - echo "Dependencies installed."
-
+   
 name: hotelmanagement
 app_root: backend
 app_port: 3000
