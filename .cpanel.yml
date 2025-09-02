@@ -1,8 +1,14 @@
 deployment:
   tasks:
-   
-name: hotelmanagement
-app_root: backend
-app_port: 3000
-app_environment: production
-app_startup_file: clean-server.js
+    - echo "Installing backend dependencies..."
+    - cd backend
+    - npm ci || npm install
+
+    - echo "Building frontend..."
+    - cd ../frontend
+    - npm ci || npm install
+    - npm run build
+
+    - echo "Starting backend server..."
+    - cd ../backend
+    - node clean-server.js
