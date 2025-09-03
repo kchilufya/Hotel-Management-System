@@ -2003,7 +2003,7 @@ if (process.env.NODE_ENV === 'production') {
 // Start server and initialize database
 async function startServer() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hotel_management');
+    await mongoose.connect(process.env.MONGODB_URI || 'MONGODB_URI=mongodb+srv://kchilufya:C00kB00k@cluster0.yakzlkt.mongodb.net/hotel_management?retryWrites=true&w=majority');
     console.log('✅ MongoDB connected');
     
     // Create admin user if it doesn't exist
