@@ -1,7 +1,7 @@
 deployment:
   tasks:
     - echo "Activating Node.js environment..."
-    - source /home/username/nodevenv/hotelmanagement/20/bin/activate
+    - source /home/ihszambia/nodevenv/hotelmanagement/backend/22/bin/activate
     - echo "Installing backend dependencies..."
     - cd backend
     - npm ci || npm install
