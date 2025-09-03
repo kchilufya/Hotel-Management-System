@@ -1,7 +1,7 @@
 {  "name": "hotelmanagement",
   "version": "1.0.0",
   "description": "A comprehensive hotel management system with Node.js backend and React frontend",
-  "main": "backend/server.js",
+  "main": "backend/clean-server.js",
   "scripts": {
     "start": "node backend/clean-server.js",
     "dev": "nodemon backend/clean-server.js",
