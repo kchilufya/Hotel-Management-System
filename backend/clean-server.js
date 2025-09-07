@@ -1993,7 +1993,7 @@ if (process.env.NODE_ENV === 'production') {
 
   // Catch-all route for React frontend (compatible with Express v3/v4/v5)
   app.get(/^(?!\/api\/).*/, function(req, res) {
-=======
+
   // Catch-all route for React frontend
   app.get('/*', (req, res) => {
     if (req.path.startsWith('/api/')) {
