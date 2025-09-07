@@ -18,4 +18,5 @@ const staffSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Staff', staffSchema);
+// Use existing model if already compiled
+module.exports = mongoose.models.Staff || mongoose.model('Staff', staffSchema);

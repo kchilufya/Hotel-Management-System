@@ -24,4 +24,5 @@ const guestSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Guest', guestSchema);
+// Use existing model if already compiled
+module.exports = mongoose.models.Guest || mongoose.model('Guest', guestSchema);

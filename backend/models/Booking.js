@@ -29,4 +29,5 @@ const bookingSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Booking', bookingSchema);
+// Use existing model if already compiled
+module.exports = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
