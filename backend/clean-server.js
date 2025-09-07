@@ -1847,7 +1847,7 @@ app.get('/api/reports/demographics', authenticateToken, checkPermission('read_re
             count: { $sum: 1 }
           }
         }
-      ],),
+      ],
 
       Guest.aggregate([
         {
@@ -1993,16 +1993,9 @@ if (process.env.NODE_ENV === 'production') {
 
   // Catch-all route for React frontend (compatible with Express v3/v4/v5)
   app.get(/^(?!\/api\/).*/, function(req, res) {
-
-  // Catch-all route for React frontend
-  app.get('/*', (req, res) => {
-    if (req.path.startsWith('/api/')) {
-      return res.status(404).json({ message: 'API endpoint not found' });
-    }
-
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
   });
-
+}
 
 // Start server and initialize database
 async function startServer() {
