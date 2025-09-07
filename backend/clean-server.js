@@ -1991,7 +1991,6 @@ const path = require('path');
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-<<<<<<< HEAD
   // Catch-all route for React frontend (compatible with Express v3/v4/v5)
   app.get(/^(?!\/api\/).*/, function(req, res) {
 =======
