@@ -1991,8 +1991,16 @@ const path = require('path');
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/build')));
 
+<<<<<<< HEAD
   // Catch-all route for React frontend (compatible with Express v3/v4/v5)
   app.get(/^(?!\/api\/).*/, function(req, res) {
+=======
+  // Catch-all route for React frontend
+  app.get('/*', (req, res) => {
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({ message: 'API endpoint not found' });
+    }
+>>>>>>> 67d532b8c4944e365276bb56d230a3718827f6ea
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
   });
 }
