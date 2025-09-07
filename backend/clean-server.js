@@ -1991,11 +1991,8 @@ const path = require('path');
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-  // Catch-all route for React frontend
-  app.get('*', (req, res) => {
-    if (req.path.startsWith('/api/')) {
-      return res.status(404).json({ message: 'API endpoint not found' });
-    }
+  // Catch-all route for React frontend (compatible with Express v3/v4/v5)
+  app.get(/^(?!\/api\/).*/, function(req, res) {
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
   });
 }
@@ -2229,7 +2226,7 @@ async function startServer() {
           lastName: 'Rodriguez',
           email: 'carlos.rodriguez@email.com',
           phone: '+34-91-123-4567',
-          address: 'Calle Mayor 100, Madrid  28013, Spain',
+          address: 'Calle Mayor 100, Madrid 28013, Spain',
           documentType: 'nationalId',
           documentNumber: 'ES12345678Z',
           dateOfBirth: new Date('1982-11-08'),
