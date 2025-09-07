@@ -1838,7 +1838,6 @@ app.get('/api/reports/demographics', authenticateToken, checkPermission('read_re
         { $sort: { count: -1 } },
         { $limit: 10 }
       ]),
-      
       Guest.aggregate([
         { $match: { status: 'active' } },
         {
@@ -1847,8 +1846,7 @@ app.get('/api/reports/demographics', authenticateToken, checkPermission('read_re
             count: { $sum: 1 }
           }
         }
-      ],
-
+      ]), // <-- REMOVE THE COMMA HERE
       Guest.aggregate([
         {
           $group: {
