@@ -2002,7 +2002,7 @@ if (process.env.NODE_ENV === 'production') {
 
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
   });
-}
+
 
 // Start server and initialize database
 async function startServer() {
