@@ -1992,7 +1992,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/build')));
 
   // Catch-all route for React frontend
-  app.get('*', (req, res) => {
+  app.get('/*', (req, res) => {
     if (req.path.startsWith('/api/')) {
       return res.status(404).json({ message: 'API endpoint not found' });
     }
