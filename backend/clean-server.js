@@ -1999,7 +1999,7 @@ if (process.env.NODE_ENV === 'production') {
     if (req.path.startsWith('/api/')) {
       return res.status(404).json({ message: 'API endpoint not found' });
     }
->>>>>>> 67d532b8c4944e365276bb56d230a3718827f6ea
+
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
   });
 }
