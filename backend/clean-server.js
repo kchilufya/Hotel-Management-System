@@ -127,7 +127,7 @@ const guestSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   address: { type: String, required: true },
   documentType: { type: String, enum: ['passport', 'nationalId', 'drivingLicense'], required: true },
-  documentNumber: { type: String, required: true },
+  documentNumber: { type: String, required: true, unique: true }, // <-- Added unique here
   dateOfBirth: { type: Date, required: true },
   nationality: { type: String, required: true },
   emergencyContact: {
