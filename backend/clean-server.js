@@ -41,11 +41,11 @@ const express = require('express');
         const maxAttempts = 10;
 
         while (!isUnique && attempts < maxAttempts) {
-          const count = await Staff.countDocuments();
+          const count = await this.constructor.countDocuments();
           employeeId = `EMP${String(count + 1 + attempts).padStart(4, '0')}`;
           console.log(`Generated employeeId: ${employeeId}`);
           
-          const existing = await Staff.findOne({ employeeId });
+          const existing = await this.constructor.findOne({ employeeId });
           if (!existing) {
             isUnique = true;
           } else {
