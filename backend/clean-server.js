@@ -2008,9 +2008,13 @@ const express = require('express');
           firstName: 'Admin',
           lastName: 'User',
           email: 'admin@hotel.com',
+          phone: '+1234567890',
           password: await bcrypt.hash('admin123', 12),
           role: 'admin',
           department: 'management',
+          hireDate: new Date(),
+          salary: 60000,
+          shift: 'morning',
           isActive: true
         });
         await adminUser.save();
