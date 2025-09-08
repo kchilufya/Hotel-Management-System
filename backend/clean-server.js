@@ -2351,7 +2351,7 @@ const express = require('express');
 
       const PORT = process.env.PORT || 5003;
       app.listen(PORT, () => {
-        console.log(`🚀 Clean server running on port ${PORT}`);
+        console.log(`🚀 Server running on port ${PORT}`);
       });
     } catch (error) {
       console.error('❌ Server startup failed:', error.message);
@@ -2359,3 +2359,12 @@ const express = require('express');
   }
 
   startServer();
+
+  if (!module.parent) {
+    const PORT = process.env.PORT || 5003;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  }
+
+  module.exports = app;
