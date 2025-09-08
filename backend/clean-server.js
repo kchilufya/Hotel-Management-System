@@ -2360,6 +2360,10 @@ const express = require('express');
 
   startServer();
 
+  app.get('/', (req, res) => {
+    res.json({ status: 'OK', message: 'Hotel Management API is running.' });
+  });
+  
   if (!module.parent) {
     const PORT = process.env.PORT || 5003;
     app.listen(PORT, () => {
