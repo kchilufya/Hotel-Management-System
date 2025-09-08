@@ -2038,54 +2038,78 @@ const express = require('express');
             firstName: 'Sarah',
             lastName: 'Johnson',
             email: 'sarah.johnson@hotel.com',
+            phone: '+1234567891',
             password: await bcrypt.hash('password123', 12),
             role: 'receptionist',
-            department: 'Front Desk',
+            department: 'frontDesk',
+            hireDate: new Date('2025-08-02'),
+            salary: 35000,
+            shift: 'afternoon',
             isActive: true
           },
           {
             firstName: 'Mike',
             lastName: 'Wilson',
             email: 'mike.wilson@hotel.com',
+            phone: '+1234567892',
             password: await bcrypt.hash('password123', 12),
             role: 'receptionist',
-            department: 'Front Desk',
+            department: 'frontDesk',
+            hireDate: new Date('2025-08-03'),
+            salary: 34000,
+            shift: 'evening',
             isActive: true
           },
           {
             firstName: 'Maria',
             lastName: 'Rodriguez',
             email: 'maria.rodriguez@hotel.com',
+            phone: '+1234567893',
             password: await bcrypt.hash('password123', 12),
             role: 'housekeeping',
-            department: 'Housekeeping',
+            department: 'housekeeping',
+            hireDate: new Date('2025-08-04'),
+            salary: 32000,
+            shift: 'morning',
             isActive: true
           },
           {
             firstName: 'David',
             lastName: 'Brown',
             email: 'david.brown@hotel.com',
+            phone: '+1234567894',
             password: await bcrypt.hash('password123', 12),
             role: 'housekeeping',
-            department: 'Housekeeping',
+            department: 'housekeeping',
+            hireDate: new Date('2025-08-05'),
+            salary: 32000,
+            shift: 'afternoon',
             isActive: true
           },
           {
             firstName: 'Lisa',
             lastName: 'Chen',
             email: 'lisa.chen@hotel.com',
+            phone: '+1234567895',
             password: await bcrypt.hash('password123', 12),
             role: 'manager',
-            department: 'Operations',
+            department: 'management',
+            hireDate: new Date('2025-08-06'),
+            salary: 48000,
+            shift: 'morning',
             isActive: true
           },
           {
             firstName: 'Robert',
             lastName: 'Taylor',
             email: 'robert.taylor@hotel.com',
+            phone: '+1234567896',
             password: await bcrypt.hash('password123', 12),
             role: 'receptionist',
-            department: 'Front Desk',
+            department: 'frontDesk',
+            hireDate: new Date('2025-08-07'),
+            salary: 33000,
+            shift: 'night',
             isActive: false
           }
         ];
@@ -2179,7 +2203,7 @@ const express = require('express');
 
       // Create sample guests if they don't exist
       const guestCount = await Guest.countDocuments();
-      if (guestCount === 0) {
+      if ( guestCount === 0) {
         const sampleGuests = [
           {
             firstName: 'John',
