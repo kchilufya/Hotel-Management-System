@@ -1998,7 +1998,7 @@ const express = require('express');
   // Start server and initialize database
   async function startServer() {
     try {
-      await mongoose.connect(process.env.MONGODB_URI || 'MONGODB_URI=mongodb+srv://kchilufya:C00kB00k@cluster0.yakzlkt.mongodb.net/hotel_management?retryWrites=true&w=majority');
+      await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/hotel_management');
       console.log('✅ MongoDB connected');
       
       // Create admin user if it doesn't exist
@@ -2349,10 +2349,13 @@ const express = require('express');
         }
       }
 
-      const PORT = process.env.PORT || 5003;
-      app.listen(PORT, () => {
-        console.log(`🚀 Server running on port ${PORT}`);
-      });
+      // Only start server if not running under Passenger
+      if (!module.parent) {
+        const PORT = process.env.PORT || 5003;
+        app.listen(PORT, () => {
+          console.log(`🚀 Server running on port ${PORT}`);
+        });
+      }
     } catch (error) {
       console.error('❌ Server startup failed:', error.message);
     }
@@ -2364,11 +2367,4 @@ const express = require('express');
     res.json({ status: 'OK', message: 'Hotel Management API is running.' });
   });
   
-  if (!module.parent) {
-    const PORT = process.env.PORT || 5003;
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
-  }
-
   module.exports = app;
