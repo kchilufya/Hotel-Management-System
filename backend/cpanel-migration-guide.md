@@ -17,12 +17,12 @@ NODE_ENV=production
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/zanji_lodge_prod
 JWT_SECRET=your-production-jwt-secret
-CORS_ORIGIN=https://zanjilodge.com
+CORS_ORIGIN=https://ihszambia.org
 ```
 
 **frontend/.env.production**
 ```
-REACT_APP_API_URL=https://zanjilodge.com/api
+REACT_APP_API_URL=https://ihszambia.org/api
 REACT_APP_HOTEL_NAME=Zanji Lodge
 REACT_APP_CONTACT_EMAIL=info@zanjilodge.com
 REACT_APP_CONTACT_PHONE=+260-212-555-789
