@@ -1,3 +1,6 @@
+PassengerAppEnv production
+PassengerStartupFile clean-server.js
+
 RewriteEngine On
 
 # Security headers
@@ -36,7 +39,7 @@ Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains
 </IfModule>
 
 # API routes - redirect to Node.js app
-RewriteRule ^api/(.*)$ /api/server.js [L,QSA]
+RewriteRule ^api/(.*)$ /api/clean-server.js [L,QSA]
 
 # Handle client-side routing for React
 RewriteCond %{REQUEST_FILENAME} !-f
